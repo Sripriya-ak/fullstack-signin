@@ -1,0 +1,34 @@
+package com.fullstack.exception;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+@RestControllerAdvice
+public class GlobalCustomValidation {
+
+
+    @ExceptionHandler
+    public ResponseEntity<Map<String,String>> handleCustomException(MethodArgumentNotValidException exception)
+    {
+        Map<String,String> errorMap=new LinkedHashMap<>();
+
+        exception.getBindingResult().getAllErrors().forEach(objectError -> {
+
+            String field=((FieldError)objectError).getField();
+            String fieldMessage=objectError.getDefaultMessage();
+            errorMap.put(field,fieldMessage);
+        });
+
+        return new ResponseEntity<>(errorMap, HttpStatus.BAD_REQUEST);
+    }
+
+
+
+}
